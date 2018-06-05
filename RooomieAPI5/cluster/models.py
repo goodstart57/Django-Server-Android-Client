@@ -14,7 +14,6 @@ class MemInfo(models.Model):
     MAJOR =                 models.CharField(max_length=48, null=True, default="통계학과")
     TS_CREATED =            models.DateTimeField(auto_now_add=True)
     TS_UPDATED =            models.DateTimeField(auto_now=True)
-
     def register(self):
         self.TS_CREATED = timezone.now()
         self.TS_UPDATED = timezone.now()
@@ -23,7 +22,7 @@ class MemInfo(models.Model):
 
 # 회원 매칭 정보(원본)
 class MemMchInfo(models.Model):
-    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True)  # PK, FK
+    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True, db_column="STUD_ID")  # PK, FK
     #STU_ID =                models.CharField(max_length=9, unique=True, primary_key=True)
     MY_GENDER =             models.CharField(max_length=2)
     MY_AGE =                models.IntegerField()
@@ -44,16 +43,15 @@ class MemMchInfo(models.Model):
     OP_DRINK =              models.IntegerField()
     OP_SMOKE =              models.CharField(max_length=8)
     AGREE_WITH =            models.CharField(max_length=32)
-    TS_UPDATED =            models.DateTimeField(auto_now=True)
-
+    # TS_UPDATED =            models.DateTimeField(auto_now=True)
     def register(self):
-        self.TS_UPDATED = timezone.now()
+        # self.TS_UPDATED = timezone.now()
         self.save()
 
 
 # K-mins 알고리즘 군집화 전 데이터
 class PreDistAnalysis(models.Model):
-    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True)  # PK, FK
+    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True, db_column="STUD_ID")  # PK, FK
     #STU_ID =                models.CharField(max_length=9, unique=True, primary_key=True)
     MY_GENDER =             models.IntegerField()
     MY_CHARACTER_F =        models.IntegerField()
@@ -66,8 +64,7 @@ class PreDistAnalysis(models.Model):
 
 # K-mins 알고리즘 군집화 후 데이터
 class AfterDistAnalysis(models.Model):
-    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True)  # PK, FK
-    #STU_ID =                models.CharField(max_length=9, unique=True, primary_key=True)
+    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True, db_column="STUD_ID")  # PK, FK
     OP_STUD_ID =             models.CharField(max_length=9)
     DISTANCE =              models.DecimalField(max_digits=4, decimal_places=4)
     DIST_RNK =              models.IntegerField()
@@ -75,8 +72,7 @@ class AfterDistAnalysis(models.Model):
 
 # 상대방 정보 테이블
 class WantnessAnalysis(models.Model):
-    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True)  # PK, FK
-    #STU_ID =                models.CharField(max_length=9, unique=True, primary_key=True)
+    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True, db_column="STUD_ID")  # PK, FK
     GENDER =                models.IntegerField()
     AGE_SCORE =             models.IntegerField()
     GRADE_SCORE =           models.IntegerField()
@@ -90,7 +86,7 @@ class WantnessAnalysis(models.Model):
 
 # 매칭 결과 테이블
 class MchResult(models.Model):
-    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True)  # PK, FK
+    STUD_ID =               models.OneToOneField(MemInfo, on_delete=models.CASCADE, primary_key=True, unique=True, db_column="STUD_ID")  # PK, FK
     OP_STUD_ID =            models.CharField(max_length=9)  # PK, FK
     GROUP =                 models.IntegerField()
     FINAL_RANK =            models.IntegerField()

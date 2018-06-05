@@ -31,11 +31,39 @@ def index(request):
 
 
 '''
-회원 5명 불러오는 메소드
+마이페이지로 회원 개인/매칭 정보 불러오는 메소드
 '''
 def getMemInfo(request):
-    tm.setType("getMemInfo")
-    return MemInfo.objects.all()[:5]
+    my_STUD_ID = request.GET["STUD_ID"]
+    my_meminfo = MemInfo.objects.filter(STUD_ID=my_STUD_ID).get()
+    my_mchinfo = MemMchInfo.objects.filter(STUD_ID=my_STUD_ID).get()
+
+    my_all_info = [{"STUD_ID":my_STUD_ID,
+                    "NAME":my_meminfo.NAME,
+                    "GENDER":df_GENDER(my_meminfo.GENDER),
+                    "PHONE":my_meminfo.PHONE,
+                    "EMAIL":my_meminfo.EMAIL,
+                    "MAJOR":my_meminfo.MAJOR,
+                    "MY_AGE":my_mchinfo.MY_AGE,
+                    "MY_GRADE":my_mchinfo.MY_GRADE,
+                    "MY_CLEAN":df_CLEAN(my_mchinfo.MY_CLEAN),
+                    "MY_YASIK":df_YASIK(my_mchinfo.MY_YASIK),
+                    "MY_CHARACTER":df_CHARACTER(my_mchinfo.MY_CHARACTER),
+                    "MY_OUTSIDE_ACTIVITY":df_OUTACT(my_mchinfo.MY_OUTSIDE_ACTIVITY),
+                    "MY_FREQ_DRINK":df_FREQ_DRINK(my_mchinfo.MY_FREQ_DRINK),
+                    "MY_DRINK":df_DRINK(my_mchinfo.MY_DRINK),
+                    "MY_SMOKE":df_SMOKE(my_mchinfo.MY_SMOKE),
+                    "OP_AGE":df_op_age(my_mchinfo.OP_AGE),
+                    "OP_GRADE":df_op_grade(my_mchinfo.OP_GRADE),
+                    "OP_CLEAN":df_op_clean(my_mchinfo.OP_CLEAN),
+                    "OP_YASIK":df_op_yasik(my_mchinfo.OP_YASIK),
+                    "OP_OUTSIDE_ACTIVITY":df_op_outact(my_mchinfo.OP_OUTSIDE_ACTIVITY),
+                    "OP_FREQ_DRINK":df_op_fdrink(my_mchinfo.OP_FREQ_DRINK),
+                    "OP_DRINK":df_op_drink(my_mchinfo.OP_DRINK),
+                    "OP_SMOKE":df_op_smoke(my_mchinfo.OP_SMOKE),
+                    "AGREE_WITH":df_AGREE_WITH(my_mchinfo.AGREE_WITH)}]
+
+    return JsonResponse(my_all_info, safe=False)
 
 
 '''
@@ -124,7 +152,6 @@ def postMemberAll(request):
     new_EMAIL = request.GET["EMAIL"]
     new_STUD_ID = request.GET["STUD_ID"]
     print("ID: ", new_ID, "PWD: ", new_PWD)
-
     new_member = MemInfo.objects.create(STUD_ID=new_STUD_ID, ID=new_ID, PWD=new_PWD, NAME=new_NAME, PHONE=new_PHONE, EMAIL=new_EMAIL)
     new_member.register()
     print("Successfully register!")
@@ -142,7 +169,7 @@ def postMatchAll(request):
     new_MY_CHARACTER =          f_CHARACTER(request.GET["MY_CHARACTER"])
     new_MY_OUTSIDE_ACTIVITY =   f_OUTACT(request.GET["MY_OUTSIDE_ACTIVITY"])
     new_MY_FREQ_DRINK =         f_FREQ_DRINK(request.GET["MY_FREQ_DRINK"])
-    new_MY_DRINK =              request.GET["MY_DRINK"]
+    new_MY_DRINK =              f_DRINK(request.GET["MY_DRINK"])
     new_MY_SMOKE =              f_SMOKE(request.GET["MY_SMOKE"])
     new_OP_AGE =                request.GET["OP_AGE"]
     new_OP_GRADE =              request.GET["OP_GRADE"]
@@ -150,13 +177,11 @@ def postMatchAll(request):
     new_OP_YASIK =              f_YASIK(request.GET["OP_YASIK"])
     new_OP_OUTSIDE_ACTIVITY =   f_YASIK(request.GET["OP_OUTSIDE_ACTIVITY"])
     new_OP_FREQ_DRINK =         f_FREQ_DRINK(request.GET["OP_FREQ_DRINK"])
-    new_OP_DRINK =              request.GET["OP_DRINK"]
+    new_OP_DRINK =              f_DRINK(request.GET["OP_DRINK"])
     new_OP_SMOKE =              f_OP_SMOKE(request.GET["OP_SMOKE"])
     new_AGREE_WITH =            f_AGREE_WITH(request.GET["AGREE_WITH"])
-
     print("성격 : ", new_MY_CHARACTER)
     print("흡연 여부 : ", new_MY_SMOKE)
-
     new_member=MemInfo.objects.filter(STUD_ID=new_STUD_ID).get()
     print("new member's NAME is ", new_member.NAME, "STUD_ID is ", new_member.STUD_ID)
     new_member_obj = MemMchInfo.objects.create(STUD_ID=MemInfo.objects.filter(STUD_ID=new_STUD_ID).get(),
@@ -180,7 +205,6 @@ def postMatchAll(request):
                                                 OP_SMOKE=new_OP_SMOKE,
                                                 AGREE_WITH=new_AGREE_WITH)
     new_member_obj.register()
-
     #추천 알고리즘 작동
     # robjects.r("""
     #     source("00.Load_Data.R")            #DB에서 데이터 load
@@ -188,14 +212,13 @@ def postMatchAll(request):
     #     source("02.Calculate_Distance.R")   #Calculate Similarity & extract top 5 & insert data into cluster_afterdistanalysis
     #     source("03.Wantness_Analysis.R")    #Calculate Wantness and Scoring & insert data into cluster_wantnessanalysis and cluster_mchresult
     # """)
-
     return JsonResponse([{"STUD_ID": "Good",
                             "MY_GENDER": "Good",
                             "MY_AGE": "Good",
                             "MY_GRADE": "Good",
                             "MY_CLEAN": "Good",
                             "MY_YASIK": "Good",
-                            "MY_CHARACTER": "Good",
+                            "MY_CHARACTER": ["Good"],
                             "MY_OUTSIDE_ACTIVITY": "Good",
                             "MY_FREQ_DRINK": "Good",
                             "MY_DRINK": "Good",
